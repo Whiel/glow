@@ -1,0 +1,37 @@
+Probably what is new to you is what is in shaders. Maybe the normal matrix too.
+
+* Compilation:
+ - added GLM to CMakeLists.txt
+ - added file shapes.hpp
+* Now we have a cube, not a quad:
+ - removed quad_positions
+ - created shapes.hpp (to place lists of coordinates in a separate file)
+ - added cube::vertices and normals to shapes.hpp
+ - added one extra buffer to model, renamed buffers.
+ - changed create_quad_model - now it is create_cube_model.
+ - Two buffers are used, see code.
+* Transformation: 
+  Added a matrix, transform, to the model structure. (model matrix)
+  Added projection and view matrices (see main(), passed to render()).
+  The projection matrix is multiplied by the view in the render() function, 
+   and the result (mvp) is passed as a Uniform to the shaders.
+  The normal matrix is also passed to the shader. 
+   This matrix is used to rotate the normals to the object position.
+
+* Shaders:
+  - The vertex shader now applies the model-view-projection transform to positions 
+    and translates the normals. Outputs the positions and the normals to the fragment shader.
+  - The fragment shader computes the blinn-phong lighting model (kind of)
+    In a nutshell:
+    + 3 kinds of light are considered:
+      - Ambient light: it is always the same and always there, it serves
+        to approximate the effect of the light that bounces and is scattered
+        in the air, and is too hard to compute.
+      - Diffuse light: when a face is perpendicular to the light it is very strongly 
+        illuminated, while when it is in 90º it is completely dark (Lambert's cosine law)
+        We use the dot product of the surface normal and the point-light vector,
+        constrained between 0 and 1 to prevent negative colour values.
+      - Specular light: The shininess of the object, when the vector (incidence+eminence)/2
+        is close to the normal, the light is more strongly reflected in shiny objects.
+        This is not easy to appreciate in a cube with flat faces anyway. 
+        
