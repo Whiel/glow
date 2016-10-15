@@ -1,11 +1,11 @@
+#include "common/shader.hpp"
+
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
 #include <vector>
 #include <iostream>
-
-#include "common/shader.hpp"
 
 /* Indices of things passed to the vertex shader.
  * These are the X in 'layout (location=X)' */
@@ -101,6 +101,7 @@ static void render()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   render_model(quad);
+  // The swapping is done in the loop
 }
 
 
@@ -118,7 +119,6 @@ static void size_callback(GLFWwindow* window,int,int){
    * to cover the whole window */
   glViewport(0, 0, width, height);
 
-  // The swapping is done in the loop
 }
 
 
