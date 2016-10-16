@@ -1,4 +1,4 @@
-#include "shapes.hpp"
+#include "common/shapes.hpp"
 #include "common/shader.hpp"
 
 #include <GL/glew.h>
@@ -69,9 +69,7 @@ static model create_cube_model()
   glEnableVertexAttribArray(POSITION_INDEX);
 
   /* New */
-  // This code feels repetitive, I will make a function out of it
-  //  for the next example.
-  //  Now it will stay to make the change more smooth from the previous example.
+  // Same as before with the new buffer
   glBindBuffer(GL_ARRAY_BUFFER, cube.normal_buffer);
   glBufferData(GL_ARRAY_BUFFER,
                sizeof(glm::vec3) * shapes::cube::normals.size(),
@@ -184,7 +182,7 @@ int main()
     return 1;
   }
 
-  glDisable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
     
   glfwSetWindowSizeCallback(window, size_callback);

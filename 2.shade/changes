@@ -5,11 +5,9 @@ Probably what is new to you is what is in shaders. Maybe the normal matrix too.
  - added file shapes.hpp
 * Now we have a cube, not a quad:
  - removed quad_positions
- - created shapes.hpp (to place lists of coordinates in a separate file)
- - added cube::vertices and normals to shapes.hpp
- - added one extra buffer to model, renamed buffers.
+ - now using common/shapes.hpp (to have lists of coordinates in a separate file)
+ - added one extra buffer for model normals in model structure, renamed buffers.
  - changed create_quad_model - now it is create_cube_model.
- - Two buffers are used, see code.
 * Transformation: 
   Added a matrix, transform, to the model structure. (model matrix)
   Added projection and view matrices (see main(), passed to render()).

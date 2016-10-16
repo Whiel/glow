@@ -1,0 +1,19 @@
+The new thing is the camera.
+If you run the program, you'll be able to rotate the camera respect the origin
+with clic+drag or move the camera around with right-clic+drag.
+
+To do handle the rotation I am using a trackball. The code for it is in common/trackball.
+The code I've sent you before is not correct, dont rely on it! I fixed this one.
+
+The translation is handled in the main file.
+
+Also, I created a new structure to hold the state of the renderer, called scene_state.
+The structure holds information about the camera, the window, the mouse...
+An instance of this structure is bound to the window using glfwSetWindowUserPointer.
+This makes the structure acessible by all event handlers without being global. Also
+it is bound to the window, so another window could use the same event handlers and
+a different state structure, and they would not interfere with each other.
+
+I have only added the structure, event handlers and some lines in the function main(),
+the shaders are the same.
+
