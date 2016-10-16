@@ -1,0 +1,9 @@
+Few changes in this one.
+I added the header common/obj.hpp
+that contains some old code to parse .obj models. The models are exported with
+Blender, a free, powerful 3d edition tool.
+To export models from Blender go to "file/export/wavefront (.obj)" and select in the bottom left zone 'Triangulate faces' and uncheck 'Write materials'. If the model does not have texture you can also uncheck 'include UVs', but it won't cause trouble if it is left on.
+
+I just changed create_cube_model to read the files. At the beginning of the render function you can see where the model is loaded, and select another file from ../models.
+
+It is also a good moment to play around with the fragment shader, now that we have smooth surfaces

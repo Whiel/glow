@@ -1,6 +1,6 @@
-#include "common/shapes.hpp"
 #include "common/shader.hpp"
 #include "common/trackball.hpp"
+#include "common/obj.hpp"
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -92,40 +92,59 @@ struct model
 };
 
 
-/* Creates a model with the coordinates and normals from shapes::cube. 
- * Two buffers are used, one for each parameter. 
+/* Creates a model with given coordinates and normals. 
+ * Very similar to the old create_cube_model
  */
-static model create_cube_model()
+static model model_from_data(std::vector<glm::vec3> & coords,
+                             std::vector<glm::vec3> & normals)
 {
-  model cube;
+  model m;
+
+  glGenBuffers(1,&m.position_buffer);
+  glGenBuffers(1,&m.normal_buffer);
+  glGenVertexArrays(1,&m.vertex_array);
   
-  glGenBuffers(1,&cube.position_buffer);
-  glGenBuffers(1,&cube.normal_buffer);
-  glGenVertexArrays(1,&cube.vertex_array);
-  
-  glBindVertexArray(cube.vertex_array);
+  glBindVertexArray(m.vertex_array);
 
   // Positions
-  glBindBuffer(GL_ARRAY_BUFFER, cube.position_buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, m.position_buffer);
   glBufferData(GL_ARRAY_BUFFER,
-               sizeof(glm::vec3) * shapes::cube::positions.size(),
-               shapes::cube::positions.data(), GL_STATIC_DRAW);
+               sizeof(glm::vec3) * coords.size(),
+               coords.data(), GL_STATIC_DRAW);
   glVertexAttribPointer(POSITION_INDEX, 3, GL_FLOAT, GL_FALSE, 0, NULL);
   glEnableVertexAttribArray(POSITION_INDEX);
 
   // normals
-  glBindBuffer(GL_ARRAY_BUFFER, cube.normal_buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, m.normal_buffer);
   glBufferData(GL_ARRAY_BUFFER,
-               sizeof(glm::vec3) * shapes::cube::normals.size(),
-               shapes::cube::normals.data(), GL_STATIC_DRAW);
+               sizeof(glm::vec3) * normals.size(),
+               normals.data(), GL_STATIC_DRAW);
   glVertexAttribPointer(NORMAL_INDEX, 3, GL_FLOAT, GL_FALSE, 0, NULL);
   glEnableVertexAttribArray(NORMAL_INDEX);
 
-  cube.vertices = shapes::cube::positions.size();
+  m.vertices = std::min(coords.size(),normals.size());
   
   glBindVertexArray(0);
+  return m;
+}
 
-  return cube;
+// Loads the coordinates and positions from a file using some old code
+// I wrote somwhen. Then uses model_from_data to make a model with it.
+static model load_model(const std::string & filename)
+{
+  
+  std::vector<glm::vec3> coords;
+  std::vector<glm::vec3> normals;
+  std::vector<glm::vec2> tex_coords; // Texture coordinates are ignored in this example
+  
+  obj::obj_file f (filename);
+  std::cout << "File '" << filename << "' contains objects:" << std::endl;
+  for (std::string object : f.objects())
+    std::cout << "   " << object << std::endl;
+  std::cout << "Only the first is loaded" << std::endl;
+  f.get_object(f.objects().front(), coords, normals, tex_coords);
+
+  return model_from_data(coords,normals);
 }
 
 /* This function just renders a model */
@@ -144,7 +163,7 @@ static void render_model(const model & m)
  * All the drawing is done here. */
 static void render(const glm::mat4 & projection, const glm::mat4 & view)
 {
-  static model cube = create_cube_model();
+  static model cube = load_model("../models/teapot.obj");
   static GLuint program = shaders::build_program("./shade.vert","./shade.frag");
   static GLint u_mvp_loc = glGetUniformLocation(program, "u_mvp");
   static GLint u_normal_mat_loc = glGetUniformLocation(program, "u_normal_mat");
@@ -230,7 +249,7 @@ int main()
   glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
   
   GLFWwindow *window =
-    glfwCreateWindow(INITIAL_WIDTH, INITIAL_HEIGHT, "3. trackball", NULL, NULL);
+    glfwCreateWindow(INITIAL_WIDTH, INITIAL_HEIGHT, "4. model", NULL, NULL);
   if (!window){
     std::cerr << "glfw: Failed to create the window." << std::endl;
     glfwTerminate();
@@ -249,19 +268,6 @@ int main()
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
 
-  // Associates a pointer to state somewhere reachable by all event handlers.
-  // This is a functionality of glfw (also common in OS's window systems)
-  //  that let the programmer associate a value (usually a pointer) to a window.
-  // If we use glfwGetWindowUserPointer, we'd get the pointer to state we are
-  //  setting here. As state is local to the main function, it will exist as long
-  //  as the window exists, so no dangling pointer issues will happen.
-  // This way we do not need a global variable for state, and in the case we
-  //  had two windows the state of each one can be different, even if they use the
-  //  same event handling functions.
-  // There are cleaner ways of doing this. You could encapsulate the window and
-  //  the event handling in a class and set the window user pointer to *this,
-  //  but some other tricks are needed to prevent pointer dangling,
-  //  and I am trying to keep examples sort and concise.
   glfwSetWindowUserPointer(window, &state);
   
   glfwSetWindowSizeCallback(window, size_callback);
@@ -269,7 +275,6 @@ int main()
   glfwSetCursorPosCallback(window, mouse_move_callback);
   glfwSetScrollCallback(window, scroll_callback);
 
-  // Force to set up the viewport, trackball and projection.
   size_callback(window,INITIAL_WIDTH,INITIAL_HEIGHT);  
   
   while(not glfwWindowShouldClose(window)){
