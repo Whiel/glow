@@ -32,20 +32,20 @@ void main()
    * practical case. */
   vec3 object_color = vec3(0.4,0.4,0.9);  
   vec3 light_color = vec3(0.8,0.8,0.8);
-  vec3 light_source = vec3(-1,2,2);
+  vec3 light_source = vec3(-2,1.5,3);
   vec3 light_direction = normalize(light_source - v_pos);
   vec3 camera = vec3(0,4,4);  
-  float specular_power = 128.0;
+  float specular_power = 64.0;
 
   vec3 halfway_vector = normalize((light_source - v_pos) + (camera - v_pos));
   vec3 color = object_color * light_color;
   // This term simulates scattered light
-  vec3 ambient_color = 0.2 * color;
+  vec3 ambient_color = 0.02 * color;
   // This term adds light depending on the angle of the surface and the light
-  vec3 diffuse_color = 1.0 * color*max(dot(v_normal,light_direction),0);
+  vec3 diffuse_color = 0.9 * color*max(dot(v_normal,light_direction),0);
   // This term adds this sharp reflections when the light and the camera are at
   // the same angle
-  vec3 specular_color = 1.0 * color*pow(max(dot(v_normal, halfway_vector),0),specular_power);
+  vec3 specular_color = 1.0 * vec3(1,1,1)*pow(max(dot(v_normal, halfway_vector),0),specular_power);
   vec3 linear_color = ambient_color + diffuse_color + specular_color;
   
   // Gamma correction, 
