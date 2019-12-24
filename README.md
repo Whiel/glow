@@ -12,3 +12,6 @@ OpenGL introductory examples I wrote for a workmate. Verbosely commented.
 
 # 4. Model
 ![obj model loaded from file](https://raw.githubusercontent.com/Whiel/glow/master/snapshots/model.png)
+
+# 5. Curves
+![obj model loaded from file](https://raw.githubusercontent.com/Whiel/glow/master/snapshots/5.curves.png)
